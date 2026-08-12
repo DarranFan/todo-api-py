@@ -1,0 +1,33 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# Python 测试和工具缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# Django 本地数据库
+db.sqlite3
+db.sqlite3-journal
+
+# 环境变量和敏感配置
+.env
+.env.local
+
+# 日志文件
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
