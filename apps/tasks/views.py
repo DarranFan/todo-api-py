@@ -1,4 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import Task
 from .serializers import TaskSerializer
@@ -27,3 +30,20 @@ class TaskViewSet(viewsets.ModelViewSet):
     search_fields = ["title", "description"]
     ordering_fields = ["title", "completed", "created_at", "updated_at"]
     ordering = ["-created_at"]
+
+
+    @action(detail=True, methods=["post"])
+    def complete(self, request, pk=None):
+        task = self.get_object()
+
+        if task.completed:
+            return Response(
+                {"detail": "该任务已经完成，不能重复完成。"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        task.completed = True
+        task.save()
+
+        serializer = self.get_serializer(task)
+        return Response(serializer.data)

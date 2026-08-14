@@ -21,8 +21,13 @@ class TaskSerializer(serializers.ModelSerializer):
                 "error_messages": {
                     "blank": "标题不能为空1。",
                 }
-            }
+            },
         }
+
+    def validate_title(self, value):
+        if value == "测试":
+            raise serializers.ValidationError("不能使用“测试”作为标题。")
+        return value
 
 # def validate_title(self, value):
 #         title = value.strip()
