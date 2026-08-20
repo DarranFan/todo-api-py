@@ -3,11 +3,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Task
-from .serializers import TaskSerializer
+from .models import Category, Task
+from .serializers import CategorySerializer, TaskSerializer
 from .pagination import TaskPagination
 
-
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all().order_by("-created_at")
+    serializer_class = CategorySerializer
 
 # ModelViewSet = 一套现成的接口模板
 # 写好下面两行后，会自动生成这些 HTTP 接口：
@@ -26,7 +28,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     # 例如：{"title": "买菜"} <-> Task 对象
     serializer_class = TaskSerializer
     pagination_class = TaskPagination
-    filterset_fields = ["completed"]
+    # filterset_fields = ["completed"]
+    filterset_fields = ["completed", "category"]
     search_fields = ["title", "description"]
     ordering_fields = ["title", "completed", "created_at", "updated_at"]
     ordering = ["-created_at"]
