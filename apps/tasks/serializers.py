@@ -15,6 +15,24 @@ class CategorySerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def validate_name(self, value):
+        request = self.context["request"]
+
+        queryset = Category.objects.filter(
+            owner=request.user,
+            name=value,
+        )
+
+        if self.instance is not None:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "你已经创建过同名分类。"
+            )
+
+        return value
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
@@ -36,6 +54,15 @@ class TaskSerializer(serializers.ModelSerializer):
                 }
             },
         }
+    def validate_category(self, value):
+        request = self.context["request"]
+
+        if value is not None and value.owner_id != request.user.id:
+            raise serializers.ValidationError(
+                "不能使用其他用户的分类。"
+            )
+
+        return value
 
     def validate_title(self, value):
         if value == "测试":

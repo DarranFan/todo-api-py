@@ -11,6 +11,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by("-created_at")
     serializer_class = CategorySerializer
 
+    def get_queryset(self):
+        return Category.objects.filter(
+            owner=self.request.user
+        ).order_by("-created_at")
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 # ModelViewSet = 一套现成的接口模板
 # 写好下面两行后，会自动生成这些 HTTP 接口：
 #   GET    /tasks/       查列表
@@ -34,6 +42,12 @@ class TaskViewSet(viewsets.ModelViewSet):
     ordering_fields = ["title", "completed", "created_at", "updated_at"]
     ordering = ["-created_at"]
 
+    def get_queryset(self):
+        return Task.objects.filter(owner=self.request.user)
+
+    # 创建任务时，自动设置 owner 为当前用户
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
     # detail=True：针对某一条任务，路径是 POST /tasks/{id}/complete/
     # detail=False 则没有 {id}，会变成 POST /tasks/complete/

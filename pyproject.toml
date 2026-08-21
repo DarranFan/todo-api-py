@@ -8,3 +8,8 @@ dependencies = [
     "django-filter>=26.1",
     "djangorestframework>=3.17.2",
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
