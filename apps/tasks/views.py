@@ -1,11 +1,53 @@
-from rest_framework import status, viewsets
+from rest_framework import generics, permissions, status, viewsets
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Category, Task
-from .serializers import CategorySerializer, TaskSerializer
+from .serializers import (
+    CategorySerializer,
+    ChangePasswordSerializer,
+    TaskSerializer,
+    UserSerializer,
+)
 from .pagination import TaskPagination
+
+
+class UserRegistrationView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+
+class ChangePasswordView(generics.GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        request.auth.delete()
+
+        return Response(
+            {"detail": "密码修改成功，请重新登录。"},
+            status=status.HTTP_200_OK,
+        )
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        request.auth.delete()
+
+        return Response(
+            {"detail": "退出登录成功。"},
+            status=status.HTTP_200_OK,
+        )
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by("-created_at")
